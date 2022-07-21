@@ -1,0 +1,13 @@
+{
+    "name": "snayvik/translation",
+    "description": "This package is useful for translation of strings in the website",
+    "type": "composer-plugin",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Snayvik\\Translation\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {}
+}
