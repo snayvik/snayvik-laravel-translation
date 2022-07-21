@@ -12,7 +12,7 @@ class TranslationServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/routes/web.php');
 
         $this->publishes([
-            __DIR__.'./config/translation.php' => config_path('SnayvikTranslation.php')
+            __DIR__.'./Config/translation.php' => config_path('SnayvikTranslation.php')
         ], 'snayvik-translation-config');
 
         $this->loadMigrationsFrom(__DIR__.'/Database/migrations');
@@ -34,7 +34,7 @@ class TranslationServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/translation.php', 'SnayvikTranslation'
+            __DIR__.'./Config/translation.php', 'SnayvikTranslation'
         );
     }
 }

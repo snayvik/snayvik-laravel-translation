@@ -30,7 +30,7 @@ class TranslationController extends Controller
     
     public function importInDb(Request $request){
         Artisan::call('translation:import:db '.$request->get('replace'));
-        return redirect()->back()->with('success', 'Tranlations are imported in database');
+        return redirect()->back()->with('success', 'Translations are imported in database');
     }
     
     public function showGroup($group){
@@ -63,9 +63,9 @@ class TranslationController extends Controller
 
     public function importInFiles(Request $request){
         Artisan::call('translation:import:files');
-        return redirect()->back()->with('success', 'Tranlations are imported in files');
+        return redirect()->back()->with('success', 'Translations are imported in files');
     }
-    
+
 
     public function store(Request $request){
         $locale = $request->get('locale');
