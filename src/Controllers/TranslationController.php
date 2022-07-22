@@ -35,7 +35,9 @@ class TranslationController extends Controller
     
     public function showGroup($group){
         $response = $this->getGroupData($group);
-        return view('SnayvikTranslationView::translations.group', $response);
+        $response['groups'] = SnvkTranslation::groupBy('group')->pluck('group')->toArray();
+        $response['locales'] = SnvkLocale::pluck('locale')->toArray();
+        return view('SnayvikTranslationView::translations.index', $response);
     }
 
     protected function getGroupData($group){
@@ -50,13 +52,10 @@ class TranslationController extends Controller
 
             $translations[$item->locale][$item->key] = $item->value;
         }
-        $keys = SnvkTranslation::where('group', $group)->groupBy('key')->pluck('key')->toArray();
         
-        $locals = SnvkLocale::pluck('locale')->toArray();
         $response['translations'] = $translations;
-        $response['group'] = $group;
-        $response['keys'] = $keys;
-        $response['locals'] = $locals;
+        $response['selected_group'] = $group;
+        $response['keys'] = SnvkTranslation::where('group', $group)->groupBy('key')->pluck('key')->toArray();
 
         return $response;
     }
@@ -77,6 +76,7 @@ class TranslationController extends Controller
         $translationService->SaveToDb($locale, $group, $key, $value, true);
 
         $groupResponse = $this->getGroupData($group);
+        $groupResponse['locales'] = SnvkLocale::pluck('locale')->toArray();
 
         $response['html'] = view('SnayvikTranslationView::translations.group-table', $groupResponse)->render();
 

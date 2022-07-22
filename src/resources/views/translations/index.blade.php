@@ -1,46 +1,68 @@
 @extends(config('SnayvikTranslation.extend_blade'))
 
 @section('content')
-<div class="container">
+<div class="container-fluid">
     @include('SnayvikTranslationView::translations.flashes')
     <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card mb-3">
-                <div class="card-body">
-                    <form method="post" action="{{ route('translations.importInDB') }}" class="row">
-                        @csrf
-                        <div class="form-group col-3">
-                            <select class="form-select" name="replace">
-                                <option value="0">Append new translation</option>
-                                <option value="1">Replace existing translation</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-1">
-                            @php
-                                $title = 'The translations which are available in lang directory will be import in the database.';
-                            @endphp
-                            <button type="submit" class="btn btn-success">Import</button>
-                        </div>
-                        <div class="form-group col-8">
-                            <p>{{ $title }}</p>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
+        <div class="col-md-8">
             <div class="card mb-3">
                 <div class="card-body row">                    
                     <div class="form-group col-3">
                         <select class="form-select" name="group" id="choose_group">
                             <option value="">Select group</option>
                             @foreach ($groups as $group)
-                                <option value="{{ $group }}">{{ $group }}</option>
+                                <option {{ !empty($selected_group) && $selected_group == $group ? 'selected' : '' }} value="{{ $group }}">{{ $group }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="form-group col-9">
                         <p>Choose a group to display the group translations. If no groups are visisble, make sure you have run the migrations and imported the translations. </p>
                     </div>
+                </div>
+            </div>
+            @if(!empty($selected_group))
+            <div class="card mb-3">
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Key</th>
+                                @foreach ($locales as $locale)
+                                <th>{{ $locale }}</th>
+                                @endforeach
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            @include('SnayvikTranslationView::translations.group-table')                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            @endif
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5>Import in database</h5>
+                    <hr>
+                    <form method="post" action="{{ route('translations.importInDB') }}" class="row">
+                        @csrf
+                        <div class="form-group col-12">                            
+                            <p>The translations which are available in lang directory will be import in the database.</p>
+                        </div>
+                        <div class="form-group col-8">
+                            <select class="form-select" name="replace">
+                                <option value="0">Append new translation</option>
+                                <option value="1">Replace existing translation</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-4">
+                            
+                            <button type="submit" class="btn btn-success">Import</button>
+                        </div>
+                        
+                    </form>
                 </div>
             </div>
 
@@ -70,10 +92,10 @@
                     <form method="post" class="form-horizontal row" action="{{ route('translations.locale.store') }}">
                         <label>Enter new locale key:</label>
                         @csrf
-                        <div class="form-group col-3">                                                
+                        <div class="form-group col-8">                                                
                             <input name="locale" class="form-control" type="text"/>
                         </div>
-                        <div class="form-group col-3">                                                
+                        <div class="form-group col-4">                                                
                             <button type="submit" class="btn btn-success">Add new locale</button>                 
                         </div>
                     </form>
@@ -82,7 +104,7 @@
 
             <div class="card mb-3">
                 <div class="card-body"> 
-                    <h5>Export all translations</h5>
+                    <h5>Write in files</h5>
                     <hr>
                     <form method="post" class="form-horizontal" action="{{ route('translations.importInFiles') }}">
                         @csrf
@@ -110,6 +132,79 @@
                 window.location.href = url;
             }
         })
+
+
+        function groupInit(){
+            const noEditables = document.querySelectorAll('#table-body .no-editable');
+            var editArea = document.getElementById('editTranslationArea')
+            var editLocale = document.getElementById('editTranslationLocale')
+            var editKey = document.getElementById('editTranslationKey')            
+
+            for (const [key, value] of Object.entries(noEditables)) {            
+                value.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    showOnlyNotEditable();
+
+                    e.target.nextElementSibling.style.display = 'block';
+                    e.target.style.display = 'none';                    
+                })
+            }
+
+            const cancelTranslationBtns = document.querySelectorAll('#table-body .cancel-translation');
+            for (const [key, value] of Object.entries(cancelTranslationBtns)) {            
+                value.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    showOnlyNotEditable()
+                });
+            }
+        }
+
+        function showOnlyNotEditable(){
+            const noEditables = document.querySelectorAll('#table-body .no-editable');
+            const editables = document.querySelectorAll('#table-body .editable');
+
+            for (const [key, value] of Object.entries(noEditables)) {            
+                value.style.display = 'block';                    
+            }
+
+            for (const [key, value] of Object.entries(editables)) {            
+                value.style.display = 'none';
+            }
+        }
+
+        groupInit();   
+        translationUpdate();  
+        
+        function translationUpdate(){
+            var updateTranslationForm = document.getElementsByClassName('updateTranslationForm');
+            for (const [key, updateForm] of Object.entries(updateTranslationForm)) {  
+                updateForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const url = e.target.action;
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("POST", url, true);
+                    var formData = new FormData(e.target)
+
+                    const data = Object.fromEntries(formData.entries());
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                    xhr.onreadystatechange = function () {
+                        if (this.readyState != 4) return;
+
+                        if (this.status == 200) {
+                            document.getElementById('table-body').innerHTML = JSON.parse(xhr.response).html
+                            
+                            groupInit();
+                            translationUpdate()
+                        }
+
+                        // end of state change: it can be after some time (async)
+                    };
+
+                    xhr.send(JSON.stringify(data));
+                })
+            }
+        }
+        
     });
 
 </script>
