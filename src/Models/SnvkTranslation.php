@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class SnvkTranslation extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['locale','group','key'];
 }
