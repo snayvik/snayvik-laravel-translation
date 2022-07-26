@@ -5,6 +5,7 @@ namespace Snayvik\Translation\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Snayvik\Translation\Models\SnvkTranslation;
 use Snayvik\Translation\Services\TranslationService;
 
@@ -50,15 +51,16 @@ class ImportTranslationInFilesCommand extends Command
         $map = TranslationService::getTranslationMap(SnvkTranslation::all());
         $locales = SnvkTranslation::groupBy('locale')->pluck('locale')->toArray();
         foreach($locales as $locale){
-            if(isset($map[$locale])){
-                $locale_dir = $this->lang_dir.'/'.$locale;
-                if(!is_dir($locale_dir)){
-                    mkdir($locale_dir);
-                }
+            if(isset($map[$locale])){               
+                foreach($map[$locale] as $group => $translations){                   
+                    if($group != $this->json_group){
+                        $locale_dir = $this->lang_dir.'/'.$locale;
+                        if(!is_dir($locale_dir)){
+                            mkdir($locale_dir);
+                        }
 
-                if(is_dir($locale_dir)){
-                    foreach($map[$locale] as $group => $translations){
-                        if($group != $this->json_group){
+                        if(is_dir($locale_dir)){
+
                             $group_file = $locale_dir.'/'.$group.'.php';                            
                             if(!is_file($group_file)){
                                 File::put($group_file, 'txt');
@@ -73,6 +75,17 @@ class ImportTranslationInFilesCommand extends Command
                             $content .= ');';
 
                             File::put($group_file, $content);
+                        }
+                    }else{
+                        // Log::info(json_encode($translations));
+                        $json_file = $this->lang_dir.'/'.$locale.'.json';
+                        $content = [];
+                        foreach($translations as $key => $value){
+                            $content[$key] = $value->value;
+                        }
+
+                        if(is_file($json_file)){
+                            File::put($json_file, json_encode($content));
                         }
                     }
                 }

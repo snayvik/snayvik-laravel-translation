@@ -18,8 +18,11 @@ class TranslationController extends Controller
 
     public $replace_existing = false;
 
-    public function __construct(){
+    public $translationService;
+
+    public function __construct(TranslationService $translationService){
         $this->lang_dir = App::langPath();
+        $this->translationService = $translationService;
     }
 
     public function index(Request $request){
@@ -62,6 +65,7 @@ class TranslationController extends Controller
 
     public function importInFiles(Request $request){
         Artisan::call('translation:import:files');
+        $this->translationService->findTranslations();
         return redirect()->back()->with('success', 'Translations are imported in files');
     }
 
@@ -72,8 +76,7 @@ class TranslationController extends Controller
         $key = $request->get('key');
         $value = $request->get('value');
 
-        $translationService = new TranslationService();
-        $translationService->SaveToDb($locale, $group, $key, $value, true);
+        $this->translationService->SaveToDb($locale, $group, $key, $value, true);
 
         $groupResponse = $this->getGroupData($group);
         $groupResponse['locales'] = SnvkLocale::pluck('locale')->toArray();
