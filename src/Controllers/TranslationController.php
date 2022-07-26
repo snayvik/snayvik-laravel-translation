@@ -33,6 +33,7 @@ class TranslationController extends Controller
     
     public function importInDb(Request $request){
         Artisan::call('translation:import:db '.$request->get('replace'));
+        $this->translationService->findTranslations();
         return redirect()->back()->with('success', 'Translations are imported in database');
     }
     
@@ -65,7 +66,6 @@ class TranslationController extends Controller
 
     public function importInFiles(Request $request){
         Artisan::call('translation:import:files');
-        $this->translationService->findTranslations();
         return redirect()->back()->with('success', 'Translations are imported in files');
     }
 
