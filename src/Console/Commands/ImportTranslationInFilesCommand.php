@@ -84,9 +84,9 @@ class ImportTranslationInFilesCommand extends Command
                             $content[$key] = $value->value;
                         }
 
-                        if(is_file($json_file)){
+                        // if(is_file($json_file)){
                             File::put($json_file, json_encode($content));
-                        }
+                        // }
                     }
                 }
             }
