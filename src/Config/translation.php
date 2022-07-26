@@ -15,17 +15,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Table Prefix
-    |--------------------------------------------------------------------------
-    |
-    | This option will add prefix in the tables which will be 
-    | migrated using migration.
-    |
-    */
-    'table_prefix' => '',
-
-    /*
-    |--------------------------------------------------------------------------
     | Extend blade
     |--------------------------------------------------------------------------
     |
@@ -34,6 +23,10 @@ return [
     |
     */
     'extend_blade' => 'layouts.app',
+
+    'content_section' => 'content',
+
+    'javascript_section' => 'js',
 
     'trans_functions' => [
         'trans',

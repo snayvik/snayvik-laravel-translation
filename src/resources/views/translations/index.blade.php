@@ -1,6 +1,6 @@
 @extends(config('SnayvikTranslation.extend_blade'))
 
-@section('content')
+@section(config('SnayvikTranslation.content_section'))
 <div class="container-fluid">
     @include('SnayvikTranslationView::translations.flashes')
     <div class="row justify-content-center">
@@ -119,7 +119,7 @@
 </div>
 @endsection
 
-@section('js')
+@section(config('SnayvikTranslation.javascript_section'))
 <script>
     document.addEventListener("DOMContentLoaded", function(event) {
         const choose_group = document.getElementById('choose_group');
