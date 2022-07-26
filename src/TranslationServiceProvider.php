@@ -3,7 +3,7 @@
 namespace Snayvik\Translation;
 use Illuminate\Support\ServiceProvider;
 use Snayvik\Translation\Console\Commands\ImportTranslationInDatabaseCommand;
-use Snayvik\Translation\console\Commands\ImportTranslationInFilesCommand;
+use Snayvik\Translation\Console\Commands\ImportTranslationInFilesCommand;
 
 class TranslationServiceProvider extends ServiceProvider
 {
